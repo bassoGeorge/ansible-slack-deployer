@@ -1,0 +1,11 @@
+{
+  "name": "deployment-notif",
+  "version": "0.0.1",
+  "description": "Handling ansible deployments with slack notifications",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
