@@ -1,9 +1,11 @@
+#!/usr/bin/env node --harmony
 ///////////////////////////////////////////////////////////////////////////////
 //                  Main runner for our notification system                  //
 ///////////////////////////////////////////////////////////////////////////////
 
 var argv = require('minimist')(process.argv.slice(2));
 var fs = require('fs');
+var shelljs = require('shelljs');
 
 var configFile = "config.json";
 
