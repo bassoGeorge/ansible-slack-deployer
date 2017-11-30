@@ -7,5 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.12.2",
+    "shelljs": "^0.7.8"
+  },
+  "bin": {
+    "deploy": "./index.js"
+  }
 }
