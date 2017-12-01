@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.17.1",
     "commander": "^2.12.2",
     "shelljs": "^0.7.8"
   },
