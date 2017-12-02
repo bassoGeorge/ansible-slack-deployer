@@ -97,9 +97,17 @@ Promise.resolve(true).then(function(){
     return ansible.run(finalCommand);
 
 }).then(function() {
-    console.log("We did it!!")
+    console.log("Deployment completed successfully")
+    return slackApi.success();
 
-}).catch(function(err) {
+}, function(err) {
     console.log("Ansible failed :(")
     console.log(err);
+    return slackApi.failure();
+
+}).catch(
+    logAndIgnoreSlackError
+
+).then(function(){
+    process.exit(0);
 })

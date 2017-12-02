@@ -14,9 +14,9 @@ function SlackAPI(webhookUrl, user) {
 
     this.test = function() {
         return this.postMessage({
-            text: "@here deployment to *Prod* commencing soon",
             attachments: [{
-                text: "Configuration",
+                title: "Deployment Announcement",
+                text: "<!here> Configuration",
                 fields: [
                     { title: "branch", value: "master", short: true },
                     { title: "tags", value: "code,config,db_migrations", short: true },
@@ -26,6 +26,12 @@ function SlackAPI(webhookUrl, user) {
                 color: "warning"
             }]
         });
+    };
+
+    this.commonAttachment = function(){
+        return {
+            mrkdwn_in: ["text"]
+        };
     };
 
     this.buildConfigAttachment = function(branch, tags, extraVars) {
@@ -39,32 +45,33 @@ function SlackAPI(webhookUrl, user) {
         if (extraVars !== undefined) {
             fields.push({ title: "Other Variables", value: extraVars.join(", "), short: false });
         }
-        return {
+
+        return Object.assign(this.commonAttachment(), {
             fields: fields
-        };
+        });
     };
 
     this.buildCommonFooter = function() {
-        return {
-            footer: "If any concerns, message "+this.user+"",
-            mrkdwn_in: ["text"]
-        };
+        return Object.assign(this.commonAttachment(), {
+            footer: "If any concerns, message "+this.user+""
+        });
     };
 
 
     this.announceDeployment = function(host, branch, tags, extraVars, timeRemaining) {
         var data = {
             text: "<!here> *"+this.user+"* will start deployment to  *"+host+"* soon",
-            link_names: 1,
             attachments: [
-                this.buildConfigAttachment(branch, tags, extraVars)
+                this.buildConfigAttachment(branch, tags, extraVars),
+                Object.assign(
+                    this.buildCommonFooter(),
+                    {
+                        text: "*T-"+timeRemaining+"m* to deployment",
+                        color: "warning"
+                    }
+                )
             ]
         };
-
-        var footer = this.buildCommonFooter();
-        footer.text = "*T-"+timeRemaining+"m* to deployment";
-        footer.color = "warning";
-        data.attachments.push(footer);
 
         return this.postMessage(data);
     };
@@ -78,6 +85,29 @@ function SlackAPI(webhookUrl, user) {
             text: "<!here> Deployment to *"+host+"* commencing"
         };
         return this.postMessage(data);
+    };
+
+    this.endMessage = function(attachment) {
+        var data = {
+            attachments: [
+                Object.assign(this.commonAttachment(), attachment)
+            ]
+        };
+        return this.postMessage(data);
+    };
+
+    this.success = function() {
+        return this.endMessage({
+            text: "<!here> Deployment succeded. QA please verify",
+            color: "good"
+        });
+    };
+
+    this.failure = function() {
+        return this.endMessage({
+            text: "<!here> Deployment failed!. Please notify "+this.user+" if he/she not already on it.",
+            color: "danger"
+        });
     };
 }
 
