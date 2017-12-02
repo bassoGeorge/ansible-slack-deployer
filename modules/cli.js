@@ -27,6 +27,7 @@ program
     .option('-t, --tags <tags>', 'Tags to deploy with (defaults to all)', coercion.list)
     .option('-e, --extra-vars <vars>', 'A space separated key=value pairs of extra ansible vars', coercion.spaceSepKeyVals)
     .option('-d, --delay [minutes]', 'Add a delay of <minutes>, defaults to 5', coercion.numeric)
+    .option('-k, --vault-key-file <vault pass file>', 'Provide the vault file')
     .arguments('<host> [branch]')
     .parse(process.argv);
 

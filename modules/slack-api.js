@@ -13,7 +13,7 @@ function SlackAPI(webhookUrl, user) {
     };
 
     this.test = function() {
-        this.postMessage({
+        return this.postMessage({
             text: "@here deployment to *Prod* commencing soon",
             attachments: [{
                 text: "Configuration",
@@ -69,11 +69,15 @@ function SlackAPI(webhookUrl, user) {
         return this.postMessage(data);
     };
 
+    this.announceDeployment_fake = function() {
+        return Promise.reject("gotcha");
+    };
+
     this.warnStart = function(host) {
         var data = {
             text: "<!here> Deployment to *"+host+"* commencing"
         };
-        this.postMessage(data);
+        return this.postMessage(data);
     };
 }
 
