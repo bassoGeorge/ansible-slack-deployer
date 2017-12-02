@@ -82,7 +82,7 @@ function SlackAPI(webhookUrl, user) {
 
     this.warnStart = function(host) {
         var data = {
-            text: "<!here> Deployment to *"+host+"* commencing"
+            text: "<!here> commencing deployment to *"+host+"*"
         };
         return this.postMessage(data);
     };
