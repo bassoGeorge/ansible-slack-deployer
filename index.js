@@ -23,27 +23,83 @@ try {
     console.log(err);
     process.exit(1);
 }
-/* TODO: add other error handling for various missing configurations */
-
-var api = new SlackAPI(config.webhook, config.user);
 
 var hostPretty = config.hosts[cli.host] || cli.host;
+/* TODO: add other error handling for various missing configurations */
 
-// api.test();
-api.announceDeployment(hostPretty, cli.branch, options.tags, options.extraVars, options.delay).then(function(){
-    console.log("Slack announcement complete");
-});
+var slackApi = new SlackAPI(config.webhook, config.user);
+var ansible = new Ansible('site.yml', 'local', true);
 
-console.log("Now waiting for "+options.delay+" minutes before proceding with deployment");
+var finalCommand = ansible.buildCommand(
+    'local',
+    cli.branch,
+    options.tags,
+    options.extraVars,
+    options.vaultKeyFile
+);
 
-setTimeout(function(){
-    var ansible = new Ansible('site.yml', 'local', true);
-    api.warnStart(hostPretty).then(function(){
-        return ansible.deploy('local', cli.branch, options.tags, options.extraVars, options.vaultKeyFile);
-    }).then(function(d) {
-        console.log("We got it")
-    }).catch(function(err) {
-        console.log("We are screwed");
-        console.log(err);
+function logAndIgnoreSlackError(err) {
+    console.log("We are having trouble with slack")
+    console.error(err);
+    return false;
+}
+
+function delayExecution(seconds) {
+    return new Promise(function(resolve, reject){
+        setTimeout(function(){
+            resolve(true)
+        }, seconds * 1000);
     })
-}, 1000 * 60 * options.delay)
+}
+
+// We use the almighty promise instead of the inferior callback
+// Start of with a resolved promise just to make things readable
+// and refactorable
+Promise.resolve(true).then(function(){
+    console.log("Ansible command to run: ");
+    console.log(finalCommand);
+    console.log("You have 5 seconds to abort (CTRL-C)")
+    return delayExecution(5);
+
+}).then(function(){
+    console.log("Starting the process. Making the slack announcement...")
+
+    // Make the slack announcement
+    return slackApi.announceDeployment(
+        hostPretty,
+        cli.branch,
+        options.tags,
+        options.extraVars,
+        options.delay
+
+    );
+
+}).then(function(){
+    console.log("Announcement complete")
+    return true;
+
+}).catch(
+    logAndIgnoreSlackError
+
+).then(function() {
+    // Now we delay the execution, pretty neat trick you see
+    console.log("Delaying execution for "+options.delay+" minutes");
+
+    return delayExecution(options.delay * 60);
+
+}).then(function(){
+    return slackApi.warnStart(hostPretty)
+
+}).catch(
+    logAndIgnoreSlackError
+
+).then(function(){
+    return ansible.run(finalCommand);
+
+}).then(function() {
+    console.log("We did it!!")
+
+}).catch(function(err) {
+    console.log("Ansible failed :(")
+    console.log(err);
+})

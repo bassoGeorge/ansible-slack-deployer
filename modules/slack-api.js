@@ -69,6 +69,10 @@ function SlackAPI(webhookUrl, user) {
         return this.postMessage(data);
     };
 
+    this.announceDeployment_fake = function() {
+        return Promise.reject("gotcha");
+    };
+
     this.warnStart = function(host) {
         var data = {
             text: "<!here> Deployment to *"+host+"* commencing"

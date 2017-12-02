@@ -5,7 +5,7 @@ function Ansible(playbook, localHost, dryRun) {
     this.dryRun = Boolean(dryRun);
     this.playbook = playbook || "site.yml";
 
-    this.deploy = function(host, branch, tags, extraVars, vaultFilePath) {
+    this.buildCommand = function(host, branch, tags, extraVars, vaultFilePath) {
         var command = "ansible-playbook "+this.playbook;
         if (this.localHost == host) {
             command += " -c local";
@@ -30,10 +30,10 @@ function Ansible(playbook, localHost, dryRun) {
         if (vaultFilePath) {
             command += ' --vault-password-file=' + vaultFilePath;
         }
+        return command;
+    };
 
-        console.log("We are going to execute the following command: ");
-        console.log(command);
-
+    this.run = function(command) {
         return new Promise(function(resolve, reject) {
             shell.exec(command, function(code, stdout, stderr){
                 if (code !== 0) {
