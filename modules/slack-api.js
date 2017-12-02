@@ -5,9 +5,7 @@ function SlackAPI(webhookUrl, user) {
     this.user = user || "Anish George";
 
     this.postMessage = function(data) {
-        axios.post(this.webhookUrl, data).then(function(response) {
-            console.log("we finished that call");
-            console.log(response);
+        return axios.post(this.webhookUrl, data).then(function(response) {
         }).catch(function(error){
             console.log("we had a problem");
             console.log(error);
@@ -68,7 +66,7 @@ function SlackAPI(webhookUrl, user) {
         footer.color = "warning";
         data.attachments.push(footer);
 
-        this.postMessage(data);
+        return this.postMessage(data);
     };
 
     this.warnStart = function(host) {
