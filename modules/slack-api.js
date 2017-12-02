@@ -1,7 +1,8 @@
 var axios = require('axios');
 
-function SlackAPI(webhookUrl) {
+function SlackAPI(webhookUrl, user) {
     this.webhookUrl = webhookUrl;
+    this.user = user || "Anish George";
 
     this.postMessage = function(data) {
         axios.post(this.webhookUrl, data).then(function(response) {
@@ -29,8 +30,7 @@ function SlackAPI(webhookUrl) {
         });
     };
 
-
-    this.warnStart = function(host, branch, tags, extraVars) {
+    this.buildConfigAttachment = function(branch, tags, extraVars) {
         var fields = [];
         if (branch !== undefined) {
             fields.push({ title: "Branch", value: branch, short: true });
@@ -41,13 +41,32 @@ function SlackAPI(webhookUrl) {
         if (extraVars !== undefined) {
             fields.push({ title: "Other Variables", value: extraVars.join(", "), short: false });
         }
-
-        var data = {
-            text: "@here deployment to *"+host+"* commencing soon",
-            attachments: [{
-                fields: fields
-            }]
+        return {
+            fields: fields
         };
+    };
+
+    this.buildCommonFooter = function() {
+        return {
+            footer: "If any concerns, message "+this.user+"",
+            mrkdwn_in: ["text"]
+        };
+    };
+
+
+    this.warnStart = function(host, branch, tags, extraVars, timeRemaining) {
+        var data = {
+            text: "<!here> *"+this.user+"* will start deployment to  *"+host+"* soon",
+            link_names: 1,
+            attachments: [
+                this.buildConfigAttachment(branch, tags, extraVars)
+            ]
+        };
+
+        var footer = this.buildCommonFooter();
+        footer.text = "*T-"+timeRemaining+"m* to deployment";
+        footer.color = "warning";
+        data.attachments.push(footer);
 
         this.postMessage(data);
     };

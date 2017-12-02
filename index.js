@@ -62,9 +62,9 @@ try {
 // console.log(program.tags);
 // console.log(program.extraVars);
 
-var api = new SlackAPI(config.webhook);
+var api = new SlackAPI(config.webhook, config.user);
 
 // api.test();
 api.warnStart(
     config.hosts[host] || host,
-    branch, program.tags, program.extraVars);
+    branch, program.tags, program.extraVars, 10);
