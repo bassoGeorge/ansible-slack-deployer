@@ -23,6 +23,9 @@ var coercion = {
             }
         })
         return res;
+    },
+    numeric: function(val) {
+        return parseFloat(val);
     }
 }
 program
@@ -30,6 +33,7 @@ program
     .option('--configure', 'Build the configuration')
     .option('-t, --tags <tags>', 'Tags to deploy with (defaults to all)', coercion.list)
     .option('-e, --extra-vars <vars>', 'A space separated key=value pairs of extra ansible vars', coercion.spaceSepKeyVals)
+    .option('-d, --delay [minutes]', 'Add a delay of <minutes>, defaults to 5', coercion.numeric)
     .arguments('<host> [branch]')
     .parse(process.argv);
 
@@ -43,6 +47,10 @@ if (program.configure) {
 
 var host = program.args[0];
 var branch = program.args[1]; // can be undefined
+
+// Now for some defaults
+program.delay = program.delay || 5;
+
 /* ---------------------------------------- */
 
 
@@ -67,8 +75,8 @@ var api = new SlackAPI(config.webhook, config.user);
 var hostPretty = config.hosts[host] || host;
 
 // api.test();
-api.announceDeployment(
-    hostPretty || host,
-    branch, program.tags, program.extraVars, 10);
+api.announceDeployment(hostPretty, branch, program.tags, program.extraVars, program.delay);
 
-api.warnStart(hostPretty)
+setTimeout(function(){
+    api.warnStart(hostPretty);
+}, 1000 * 60 * program.delay)
