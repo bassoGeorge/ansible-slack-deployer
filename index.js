@@ -3,26 +3,24 @@
 //                  Main runner for our notification system                  //
 ///////////////////////////////////////////////////////////////////////////////
 
-var fs = require('fs');
 var SlackAPI = require('./modules/slack-api');
+var Ansible = require("./modules/ansible");
 
-var configFile = "deployment-notif.config.json";
 
 /* -------- Setup commandline ------------- */
 var cli = require('./modules/cli');
 var options = cli.options;
 /* ---------------------------------------- */
 
-var Ansible = require("./modules/ansible");
+/* -------- Setup configuration ----------- */
+var configHandler = require('./modules/config-handler');
 
-
-try {
-    var config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
-} catch (err) {
-    console.log("Bad configuration file");
-    console.log(err);
-    process.exit(1);
+if (options.configure) {
+    // Logic to build config and exit
 }
+
+var config = configHandler.load();
+/* ---------------------------------------- */
 
 var hostPretty = config.hosts[cli.host] || cli.host;
 /* TODO: add other error handling for various missing configurations */
