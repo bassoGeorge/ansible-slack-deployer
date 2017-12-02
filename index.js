@@ -64,7 +64,11 @@ try {
 
 var api = new SlackAPI(config.webhook, config.user);
 
+var hostPretty = config.hosts[host] || host;
+
 // api.test();
-api.warnStart(
-    config.hosts[host] || host,
+api.announceDeployment(
+    hostPretty || host,
     branch, program.tags, program.extraVars, 10);
+
+api.warnStart(hostPretty)

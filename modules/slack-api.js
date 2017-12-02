@@ -54,7 +54,7 @@ function SlackAPI(webhookUrl, user) {
     };
 
 
-    this.warnStart = function(host, branch, tags, extraVars, timeRemaining) {
+    this.announceDeployment = function(host, branch, tags, extraVars, timeRemaining) {
         var data = {
             text: "<!here> *"+this.user+"* will start deployment to  *"+host+"* soon",
             link_names: 1,
@@ -68,6 +68,13 @@ function SlackAPI(webhookUrl, user) {
         footer.color = "warning";
         data.attachments.push(footer);
 
+        this.postMessage(data);
+    };
+
+    this.warnStart = function(host) {
+        var data = {
+            text: "<!here> Deployment to *"+host+"* commencing"
+        };
         this.postMessage(data);
     };
 }
