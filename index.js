@@ -4,7 +4,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var fs = require('fs');
-var shelljs = require('shelljs');
 var SlackAPI = require('./modules/slack-api');
 
 var configFile = "deployment-notif.config.json";
@@ -13,6 +12,8 @@ var configFile = "deployment-notif.config.json";
 var cli = require('./modules/cli');
 var options = cli.options;
 /* ---------------------------------------- */
+
+var Ansible = require("./modules/ansible");
 
 
 try {
@@ -36,5 +37,13 @@ api.announceDeployment(hostPretty, cli.branch, options.tags, options.extraVars, 
 console.log("Now waiting for "+options.delay+" minutes before proceding with deployment");
 
 setTimeout(function(){
-    api.warnStart(hostPretty);
+    var ansible = new Ansible('site.yml', 'local', true);
+    api.warnStart(hostPretty).then(function(){
+        return ansible.deploy('local', cli.branch, options.tags, options.extraVars, options.vaultKeyFile);
+    }).then(function(d) {
+        console.log("We got it")
+    }).catch(function(err) {
+        console.log("We are screwed");
+        console.log(err);
+    })
 }, 1000 * 60 * options.delay)
