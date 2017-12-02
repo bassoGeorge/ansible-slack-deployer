@@ -13,8 +13,8 @@ var configHandler = require('./modules/config-handler');
 
 if (options.configure) {
     // Logic to build config and exit
-    console.log("We should be running an interactive configuration builder ryt now:");
-    process.exit(2);
+    console.log("Running interactive session to build configuration");
+    configHandler.build();
 } else {
     console.log("cli host: "+cli.host);
     var config = configHandler.load();
