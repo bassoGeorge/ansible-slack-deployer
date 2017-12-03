@@ -5,11 +5,7 @@ function SlackAPI(webhookUrl, user) {
     this.user = user || "Anish George";
 
     this.postMessage = function(data) {
-        return axios.post(this.webhookUrl, data).then(function(response) {
-        }).catch(function(error){
-            console.log("we had a problem");
-            console.log(error);
-        });
+        return axios.post(this.webhookUrl, data);
     };
 
     this.test = function() {

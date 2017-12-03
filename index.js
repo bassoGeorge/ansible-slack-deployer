@@ -13,7 +13,6 @@ var configHandler = require('./modules/config-handler');
 
 if (options.configure) {
     // Logic to build config and exit
-    console.log("Running interactive session to build configuration");
     configHandler.build();
 } else {
     var config = configHandler.load();

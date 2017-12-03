@@ -5,6 +5,8 @@
 var SlackAPI = require('./slack-api');
 var Ansible = require("./ansible");
 
+var out = require('./output');
+
 /**
  * Main deployment runner, requires a couple of things
  * @param {Object<name, pretty>} host: The host information.
@@ -30,8 +32,8 @@ module.exports = function(host, branch, options, config) {
     );
 
     function logAndIgnoreSlackError(err) {
-        console.log("We are having trouble with slack");
-        console.error(err);
+        out.warn("We are having trouble with slack");
+        console.log(err);
         return false;
     }
 
@@ -49,11 +51,11 @@ module.exports = function(host, branch, options, config) {
     Promise.resolve(true).then(function(){
         console.log("Ansible command to run: ");
         console.log(finalCommand);
-        console.log("You have 5 seconds to abort (CTRL-C)");
+        out.warn("You have 5 seconds to abort (CTRL-C)");
         return delayExecution(5);
 
     }).then(function(){
-        console.log("Starting the process. Making the slack announcement...");
+        out.info("Starting the process. Making the slack announcement...");
 
         // Make the slack announcement
         return slackApi.announceDeployment(
@@ -66,7 +68,7 @@ module.exports = function(host, branch, options, config) {
         );
 
     }).then(function(){
-        console.log("Announcement complete");
+        out.success("Announcement complete");
         return true;
 
     }).catch(
@@ -74,7 +76,7 @@ module.exports = function(host, branch, options, config) {
 
     ).then(function() {
         // Now we delay the execution, pretty neat trick you see
-        console.log("Delaying execution for "+options.delay+" minutes");
+        out.info("Delaying execution for "+options.delay+" minutes");
 
         return delayExecution(options.delay * 60);
 
@@ -88,11 +90,11 @@ module.exports = function(host, branch, options, config) {
         return ansible.run(finalCommand);
 
     }).then(function() {
-        console.log("Deployment completed successfully");
+        out.success("Deployment completed successfully");
         return slackApi.success(host.pretty);
 
     }, function(err) {
-        console.log("Ansible failed :(");
+        out.error("Ansible failed :(");
         console.log(err);
         return slackApi.failure(host.pretty);
 

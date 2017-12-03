@@ -7,9 +7,11 @@ var fs = require('fs');
 var configFile = "deployment-notif.config.json";
 var hostPath = "./hosts/";
 
+var out = require('./output');
+
 function findHosts() {
     if (!fs.existsSync(hostPath)) {
-        console.error("Cannot find hosts/ folders in current directory. This tool may not work correctly");
+        out.error("Cannot find hosts/ folders in current directory. This tool may not work correctly");
         return [];
     }
     return fs.readdirSync(hostPath);
@@ -37,7 +39,7 @@ module.exports = {
         try {
             var config = getConfig();
         } catch (err) {
-            console.log("Bad or missing configuration file");
+            out.error("Bad or missing configuration file");
             console.log(err);
             process.exit(1);
         }
@@ -47,6 +49,7 @@ module.exports = {
     save: saveConfig,
 
     build: function() {
+        out.info("Running interactive session to build configuration. Please answer the questions below.");
         var inquirer = require('inquirer');
 
         // Step 0: Retrieve any existing config to provide default values
@@ -59,18 +62,18 @@ module.exports = {
         var questions = [
             {
                 name: "user",
-                message: "Enter your name",
+                message: "Your name",
                 default: oldConfig.user || "Developer"
             },
             {
                 name: "webhook",
-                message: "Enter the webhook URL for posting messages to slack",
+                message: "The webhook URL for posting messages to slack",
                 default: oldConfig.webhook
             },
             {
                 name: "playbook",
                 default: oldConfig.playbook || "site.yml",
-                message: "Enter the default playbook to use for deployments"
+                message: "The default playbook to use for deployments"
             }
         ];
 
@@ -107,7 +110,7 @@ module.exports = {
             });
             answers.hosts = formatted;
 
-            console.log("Thats it, let's take a moment to review, here is your data");
+            out.info("Thats it, let's take a moment to review, here is your data");
             console.log(answers);
 
             return Promise.all([
@@ -129,7 +132,7 @@ module.exports = {
         }).then(function(result){
             return saveConfig(result);
         }, function(){
-            console.log("Operation cancelled!");
+            out.warn("Operation cancelled!");
         });
     }
 };
