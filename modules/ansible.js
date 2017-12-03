@@ -1,9 +1,10 @@
 var shell = require('shelljs');
 
-function Ansible(playbook, localHost, dryRun) {
+function Ansible(playbook, localHost, dryRun, verbose) {
     this.localHost = localHost;
     this.dryRun = Boolean(dryRun);
     this.playbook = playbook || "site.yml";
+    this.verbose = Boolean(verbose);
 
     this.buildCommand = function(host, branch, tags, extraVars, vaultFilePath) {
         var command = "ansible-playbook "+this.playbook;
@@ -12,6 +13,9 @@ function Ansible(playbook, localHost, dryRun) {
         }
         if (this.dryRun) {
             command += " --check";
+        }
+        if (this.verbose) {
+            command += " -v";
         }
 
         command += " -i hosts/" + host;

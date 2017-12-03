@@ -20,7 +20,8 @@ module.exports = function(host, branch, options, config) {
     var ansible = new Ansible(
         options.playbook || config.playbook || 'site.yml',
         config.current_host,
-        options.dryRun
+        options.dryRun,
+        options.verbose
     );
 
     var finalCommand = ansible.buildCommand(
@@ -32,8 +33,10 @@ module.exports = function(host, branch, options, config) {
     );
 
     function logAndIgnoreSlackError(err) {
-        out.warn("We are having trouble with slack");
-        console.log(err);
+        out.warn("Slack failed");
+        if (options.verbose) {
+            out.error(err);
+        }
         return false;
     }
 

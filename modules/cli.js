@@ -32,6 +32,7 @@ program
     .option('-p, --playbook <alternate playbook>', 'Provide alternate playbook to the one in configuration')
     .option('--no-slack', "Don't message on slack or wait")
     .option('--dry-run', "Don't do the deployment, just do an ansible --check run" )
+    .option('--verbose', "Verbose output")
     .arguments('<host> [branch]')
     .parse(process.argv);
 
