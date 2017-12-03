@@ -30,6 +30,7 @@ program
     .option('-d, --delay [minutes]', 'Add a delay of <minutes>, defaults to 5', coercion.numeric)
     .option('-k, --vault-key-file <vault pass file>', 'Provide the vault file')
     .option('-p, --playbook <alternate playbook>', 'Provide alternate playbook to the one in configuration')
+    .option('--no-slack', "Don't message on slack or wait")
     .option('--dry-run', "Don't do the deployment, just do an ansible --check run" )
     .arguments('<host> [branch]')
     .parse(process.argv);
