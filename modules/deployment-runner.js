@@ -18,7 +18,7 @@ module.exports = function(host, branch, options, config) {
     var ansible = new Ansible(
         options.playbook || config.playbook || 'site.yml',
         config.current_host,
-        true
+        options.dryRun
     );
 
     var finalCommand = ansible.buildCommand(

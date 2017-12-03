@@ -16,7 +16,6 @@ if (options.configure) {
     console.log("Running interactive session to build configuration");
     configHandler.build();
 } else {
-    console.log("cli host: "+cli.host);
     var config = configHandler.load();
     var host = config.hosts.find(function(host){
         return host.id == cli.host;
