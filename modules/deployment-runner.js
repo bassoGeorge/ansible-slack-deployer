@@ -20,7 +20,8 @@ module.exports = function(host, branch, options, config) {
     var ansible = new Ansible(
         options.playbook || config.playbook || 'site.yml',
         config.current_host,
-        options.dryRun
+        options.dryRun,
+        options.verbose
     );
 
     var finalCommand = ansible.buildCommand(
@@ -32,8 +33,10 @@ module.exports = function(host, branch, options, config) {
     );
 
     function logAndIgnoreSlackError(err) {
-        out.warn("We are having trouble with slack");
-        console.log(err);
+        out.warn("Slack failed");
+        if (options.verbose) {
+            out.error(err);
+        }
         return false;
     }
 
@@ -55,48 +58,60 @@ module.exports = function(host, branch, options, config) {
         return delayExecution(5);
 
     }).then(function(){
-        out.info("Starting the process. Making the slack announcement...");
+        out.info("Starting the process.");
 
-        // Make the slack announcement
-        return slackApi.announceDeployment(
-            host.pretty,
-            branch,
-            options.tags,
-            options.extraVars,
-            options.delay
+        if (options.slack) {
+            out.info("Making the slack announcement...");
 
-        );
+            // Make the slack announcement
+            return slackApi.announceDeployment(
+                host.pretty,
+                branch,
+                options.tags,
+                options.extraVars,
+                options.delay
+
+            ).then(function(){
+                out.success("Announcement complete");
+                return true;
+
+            }).catch(logAndIgnoreSlackError);
+
+        } else return true;
+
+    }).then(function() {
+        if (options.slack) {
+            // Now we delay the execution, pretty neat trick you see
+            out.info("Delaying execution for "+options.delay+" minutes");
+
+            return delayExecution(options.delay * 60);
+        } else return true;
 
     }).then(function(){
-        out.success("Announcement complete");
-        return true;
-
-    }).catch(
-        logAndIgnoreSlackError
-
-    ).then(function() {
-        // Now we delay the execution, pretty neat trick you see
-        out.info("Delaying execution for "+options.delay+" minutes");
-
-        return delayExecution(options.delay * 60);
+        if (options.slack) {
+            return slackApi.warnStart(host.pretty).catch(
+                logAndIgnoreSlackError
+            );
+        } else return true;
 
     }).then(function(){
-        return slackApi.warnStart(host.pretty);
-
-    }).catch(
-        logAndIgnoreSlackError
-
-    ).then(function(){
+        out.info("Running Ansible Deployment...");
         return ansible.run(finalCommand);
 
     }).then(function() {
         out.success("Deployment completed successfully");
-        return slackApi.success(host.pretty);
+
+        if (options.slack) {
+            return slackApi.success(host.pretty);
+        } else return true;
 
     }, function(err) {
         out.error("Ansible failed :(");
         console.log(err);
-        return slackApi.failure(host.pretty);
+
+        if (options.slack) {
+            return slackApi.failure(host.pretty);
+        } else return false;
 
     }).catch(
         logAndIgnoreSlackError
