@@ -15,7 +15,11 @@ var Ansible = require("./ansible");
 module.exports = function(host, branch, options, config) {
 
     var slackApi = new SlackAPI(config.webhook, config.user);
-    var ansible = new Ansible('site.yml', 'local', true);
+    var ansible = new Ansible(
+        options.playbook || config.playbook || 'site.yml',
+        config.current_host,
+        true
+    );
 
     var finalCommand = ansible.buildCommand(
         host.id,
