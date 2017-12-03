@@ -88,11 +88,9 @@ module.exports = {
 
         // Step 2.b: Determine the current host
 
-        var hostDefault = hosts.indexOf("localy") + 1;
-        // The +1 is genius. choices will have "none" prepended.
-        // If -1, then "none" else will be correct index for "local" in the final choices
         var choices = ["none"].concat(hosts);
-
+        var hostDefault = choices.indexOf("local");
+        // inquirer handles -1 pretty well
         questions.push({
             name: "current_host",
             type: "list",

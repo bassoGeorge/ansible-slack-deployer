@@ -96,16 +96,16 @@ function SlackAPI(webhookUrl, user) {
         return this.postMessage(data);
     };
 
-    this.success = function() {
+    this.success = function(host) {
         return this.endMessage({
-            text: "<!here> Deployment succeded. QA please verify",
+            text: "<!here> Deployment to *"+host+"* succeded. QA please verify",
             color: "good"
         });
     };
 
-    this.failure = function() {
+    this.failure = function(host) {
         return this.endMessage({
-            text: "<!here> Deployment failed!. Please notify "+this.user+" if he/she not already on it.",
+            text: "<!here> Deployment to *"+host+"*failed!. Please notify "+this.user+" if he/she not already on it.",
             color: "danger"
         });
     };

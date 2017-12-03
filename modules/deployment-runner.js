@@ -89,12 +89,12 @@ module.exports = function(host, branch, options, config) {
 
     }).then(function() {
         console.log("Deployment completed successfully");
-        return slackApi.success();
+        return slackApi.success(host.pretty);
 
     }, function(err) {
         console.log("Ansible failed :(");
         console.log(err);
-        return slackApi.failure();
+        return slackApi.failure(host.pretty);
 
     }).catch(
         logAndIgnoreSlackError
