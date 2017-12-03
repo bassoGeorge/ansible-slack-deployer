@@ -23,6 +23,7 @@ var coercion = {
 
 program
     .version('0.0.1')
+    .description('Ansible deployer with slack integration.')
     .option('--configure', 'Build the configuration')
     .option('-t, --tags <tags>', 'Tags to deploy with (defaults to all)', coercion.list)
     .option('-e, --extra-vars <vars>', 'A space separated key=value pairs of extra ansible vars', coercion.spaceSepKeyVals)
