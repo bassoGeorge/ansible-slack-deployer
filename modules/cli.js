@@ -31,10 +31,7 @@ program
     .arguments('<host> [branch]')
     .parse(process.argv);
 
-if (program.configure) {
-    console.log("We are getting ready to configure this tool");
-    process.exit(0);
-} else if (program.args.length == 0) {
+if (program.args.length == 0 && !program.configure) {
     console.error("No host given!");
     process.exit(1);
 }
