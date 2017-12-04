@@ -22,7 +22,7 @@ var coercion = {
 };
 
 program
-    .version('0.0.1')
+    .version('0.9.0')
     .description('Ansible deployer with slack integration.')
     .option('--configure', 'Build the configuration')
     .option('-t, --tags <tags>', 'Tags to deploy with (defaults to all)', coercion.list)

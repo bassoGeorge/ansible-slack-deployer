@@ -1,6 +1,6 @@
 {
-  "name": "deployment-notif",
-  "version": "0.0.1",
+  "name": "ansible-slack",
+  "version": "0.9.0",
   "description": "Handling ansible deployments with slack notifications",
   "main": "index.js",
   "scripts": {
