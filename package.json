@@ -1,11 +1,21 @@
 {
-  "name": "deployment-notif",
-  "version": "0.0.1",
+  "name": "ansible-slack",
+  "version": "0.9.0",
   "description": "Handling ansible deployments with slack notifications",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.17.1",
+    "chalk": "^2.3.0",
+    "commander": "^2.12.2",
+    "inquirer": "^4.0.1",
+    "shelljs": "^0.7.8"
+  },
+  "bin": {
+    "ansible-slack": "./index.js"
+  }
 }
