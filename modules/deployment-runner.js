@@ -2,6 +2,8 @@
 //                         The main deployment runner                        //
 ///////////////////////////////////////////////////////////////////////////////
 
+var inquirer = require('inquirer');
+
 var SlackAPI = require('./slack-api');
 var Ansible = require("./ansible");
 
@@ -53,11 +55,15 @@ module.exports = function(host, branch, options, config) {
     // and refactorable
     Promise.resolve(true).then(function(){
         console.log("Ansible command to run: ");
-        console.log(finalCommand);
-        out.warn("You have 5 seconds to abort (CTRL-C)");
-        return delayExecution(5);
+        out.enhanced(finalCommand);
 
-    }).then(function(){
+        return inquirer.prompt([{
+            name: "description",
+            message: "Enter optional description (CTRL-C to abort):",
+            default: null
+        }]);
+
+    }).then(function(answers){
         out.info("Starting the process.");
 
         if (options.slack) {
@@ -69,8 +75,8 @@ module.exports = function(host, branch, options, config) {
                 branch,
                 options.tags,
                 options.extraVars,
-                options.delay
-
+                options.delay,
+                answers.description
             ).then(function(){
                 out.success("Announcement complete");
                 return true;

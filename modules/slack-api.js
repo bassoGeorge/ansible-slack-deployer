@@ -54,15 +54,20 @@ function SlackAPI(webhookUrl, user) {
     };
 
 
-    this.announceDeployment = function(host, branch, tags, extraVars, timeRemaining) {
+    this.announceDeployment = function(host, branch, tags, extraVars, timeRemaining, desc) {
         var data = {
-            text: "<!here> *"+this.user+"* will start deployment to  *"+host+"* soon",
+            text: "<!here> *"+this.user+"* will start deployment to *"+host+"* soon",
             attachments: [
-                this.buildConfigAttachment(branch, tags, extraVars),
+                Object.assign(
+                    this.buildConfigAttachment(branch, tags, extraVars),
+                    {
+                        text: desc ? "_"+desc+"_" : null
+                    }
+                ),
                 Object.assign(
                     this.buildCommonFooter(),
                     {
-                        text: "*T-"+timeRemaining+"m* to deployment",
+                        text: "*"+timeRemaining+" mins* to deployment",
                         color: "warning"
                     }
                 )

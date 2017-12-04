@@ -16,5 +16,8 @@ module.exports = {
     },
     info: function(message) {
         console.log(chalk.cyan(message));
+    },
+    enhanced: function(message) {
+        console.log(chalk.cyan.bold(message));
     }
 };
