@@ -4,7 +4,7 @@
 
 var fs = require('fs');
 
-var configFile = "deployment-notif.config.json";
+var configFile = "ansible-slack.config.json";
 var hostPath = "./hosts/";
 
 var out = require('./output');
