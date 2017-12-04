@@ -16,6 +16,6 @@
     "shelljs": "^0.7.8"
   },
   "bin": {
-    "deploy": "./index.js"
+    "ansible-slack": "./index.js"
   }
 }
