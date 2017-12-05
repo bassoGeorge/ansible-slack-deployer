@@ -34,13 +34,6 @@ module.exports = function(host, branch, options, config) {
         options.vaultKeyFile
     );
 
-    function logAndIgnoreSlackError(err) {
-        out.warn("Slack failed");
-        if (options.verbose) {
-            out.error(err);
-        }
-        return false;
-    }
 
     function delayExecution(seconds) {
         return new Promise(function(resolve, reject){
@@ -80,8 +73,7 @@ module.exports = function(host, branch, options, config) {
             ).then(function(){
                 out.success("Announcement complete");
                 return true;
-
-            }).catch(logAndIgnoreSlackError);
+            });
 
         } else return true;
 
@@ -95,9 +87,7 @@ module.exports = function(host, branch, options, config) {
 
     }).then(function(){
         if (options.slack) {
-            return slackApi.warnStart(host.pretty).catch(
-                logAndIgnoreSlackError
-            );
+            return slackApi.warnStart(host.pretty);
         } else return true;
 
     }).then(function(){
@@ -106,23 +96,32 @@ module.exports = function(host, branch, options, config) {
 
     }).then(function() {
         out.success("Deployment completed successfully");
-
-        if (options.slack) {
-            return slackApi.success(host.pretty);
-        } else return true;
+        return true;
 
     }, function(err) {
         out.error("Ansible failed :(");
         console.log(err);
+        return false;
 
-        if (options.slack) {
-            return slackApi.failure(host.pretty);
-        } else return false;
-
-    }).catch(
-        logAndIgnoreSlackError
-
-    ).then(function(){
+    }).then(function(res){
+        if (options.pauseForManual && res) {
+            return inquirer.prompt([{
+                name: "manual",
+                message: "Ansible deployment complete. Please confirm manual process completion: ",
+                type: "confirm"
+            }]).then(function(ans){
+                return ans.manual;
+            });
+        } else return res;
+    }).then(function(res){
+        if(options.slack) {
+            if (res) {
+                return slackApi.success(host.pretty);
+            } else {
+                return slackApi.failure(host.pretty);
+            }
+        } else return true;
+    }).then(function(){
         process.exit(0);
     });
 };

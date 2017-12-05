@@ -1,11 +1,23 @@
 var axios = require('axios');
+var out = require('./output');
 
-function SlackAPI(webhookUrl, user) {
+
+function SlackAPI(webhookUrl, user, verbose) {
     this.webhookUrl = webhookUrl;
     this.user = user || "Anish George";
+    this.verbose = verbose;
 
     this.postMessage = function(data) {
-        return axios.post(this.webhookUrl, data);
+        return axios.post(this.webhookUrl, data).then(
+            function() { return true; },
+            function(err){
+                out.warn("Slack failed");
+                if (verbose) {
+                    out.error(err);
+                }
+                return false;
+            }
+        );
     };
 
     this.test = function() {
