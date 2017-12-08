@@ -23,8 +23,10 @@ function Ansible(playbook, localHost, dryRun, verbose) {
             command += " -t " + tags.join(',');
         }
 
-        extraVars = extraVars || [];
-        extraVars.push("branch="+branch);
+        extraVars = (extraVars || []).slice();
+        if (branch) {
+            extraVars.push("branch="+branch);
+        }
 
         var actualExtraVars = extraVars.join(' ');
         if (actualExtraVars.length > 0) {
