@@ -103,6 +103,10 @@ module.exports = function(host, branch, options, config) {
         console.log(err);
         return false;
 
+    }).then(function(res) {
+        if (options.pauseForManual && options.slack && res) {
+            return slackApi.pauseInfo();
+        } else return res;
     }).then(function(res){
         if (options.pauseForManual && res) {
             return inquirer.prompt([{

@@ -99,6 +99,12 @@ function SlackAPI(webhookUrl, user, verbose) {
         };
         return this.postMessage(data);
     };
+    this.pauseInfo = function() {
+        var data = {
+            text: "<!here> deployment paused for some manual scripts..."
+        };
+        return this.postMessage(data);
+    };
 
     this.endMessage = function(attachment) {
         var data = {
@@ -108,6 +114,7 @@ function SlackAPI(webhookUrl, user, verbose) {
         };
         return this.postMessage(data);
     };
+
 
     this.success = function(host) {
         return this.endMessage({
