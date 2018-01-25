@@ -95,13 +95,13 @@ function SlackAPI(webhookUrl, user, verbose) {
 
     this.warnStart = function(host) {
         var data = {
-            text: "<!here> commencing deployment to *"+host+"*"
+            text: "commencing deployment to *"+host+"*"
         };
         return this.postMessage(data);
     };
     this.pauseInfo = function() {
         var data = {
-            text: "<!here> deployment paused for some manual scripts..."
+            text: "deployment paused for some manual scripts..."
         };
         return this.postMessage(data);
     };
